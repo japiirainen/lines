@@ -15,6 +15,14 @@ extra-source-files:
 library
   exposed-modules:
       Lib
+      Lines.App
+      Lines.App.Class
+      Lines.App.Error
+      Lines.Git
+      Lines.Logger
+      Lines.Main
+      Lines.Options
+      Lines.Prelude
   other-modules:
       Paths_lines
   hs-source-dirs:
@@ -46,10 +54,15 @@ library
       TypeFamilies
   ghc-options: -Weverything -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe
   build-depends:
-      base >=4.7 && <5
+      ansi-terminal
+    , base >=4.7 && <5
+    , bytestring
     , conduit
+    , envparse
     , filepath
     , mtl
+    , optparse-applicative
+    , process
     , rio
     , text
     , transformers
@@ -86,10 +99,13 @@ executable lines-exe
       StandaloneDeriving
       TypeApplications
       TypeFamilies
-  ghc-options: -Weverything -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Weverything -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , conduit
     , lines
+    , rio
+    , text
   default-language: Haskell2010
 
 test-suite lines-test
@@ -127,8 +143,5 @@ test-suite lines-test
   ghc-options: -Weverything -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , conduit
     , lines
-    , rio
-    , text
   default-language: Haskell2010

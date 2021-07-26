@@ -49,7 +49,12 @@ library:
     - filepath
     - transformers
     - mtl
+    - optparse-applicative
+    - envparse
     - text
+    - ansi-terminal
+    - bytestring
+    - process
 
 executables:
   lines-exe:
@@ -62,6 +67,9 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - lines
+    - rio
+    - conduit
+    - text
 
 tests:
   lines-test:
@@ -73,6 +81,3 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - lines
-    - rio
-    - conduit
-    - text
