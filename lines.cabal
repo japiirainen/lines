@@ -19,10 +19,12 @@ library
       Lines.App.Class
       Lines.App.Error
       Lines.Git
+      Lines.LinesResult
       Lines.Logger
       Lines.Main
       Lines.Options
       Lines.Prelude
+      Lines.Run
   other-modules:
       Paths_lines
   hs-source-dirs:

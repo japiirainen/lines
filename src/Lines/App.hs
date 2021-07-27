@@ -37,6 +37,10 @@ instance HasSystem App where
         logDebug $ "doesDirectoryExist: " <> displayShow path
         appIO SystemError $ Directory.doesDirectoryExist path
 
+    isFileSymbolicLink path = do
+        logDebug $ "isFileSymbolicLink: " <> displayShow path
+        appIO SystemError $ Directory.pathIsSymbolicLink path
+
     listDirectory path = do
         logDebug $ "listDirectory" <> displayShow path
         appIO SystemError $ Directory.listDirectory path

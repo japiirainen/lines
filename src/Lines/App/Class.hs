@@ -13,6 +13,7 @@ class HasSystem env where
     setCurrentDirectory :: FilePath -> RIO env ()
     doesFileExist :: FilePath -> RIO env Bool
     doesDirectoryExist :: FilePath -> RIO env Bool
+    isFileSymbolicLink :: FilePath -> RIO env Bool
     listDirectory :: FilePath -> RIO env [FilePath]
     readFile :: FilePath -> RIO env Text
     readFileBS :: FilePath -> RIO env ByteString

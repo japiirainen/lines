@@ -7,6 +7,7 @@ import           Lines.App.Class
 import           Lines.Logger
 import           Lines.Options
 import           Lines.Prelude
+import           Lines.Run
 
 
 linesMain ::
@@ -18,8 +19,11 @@ linesMain ::
     )
     => RIO env a
 linesMain = do
-    opts <- view optionsL
+    tDir <- oTargetDirectory <$> view optionsL
 
-    logDebug $ "opts" <> displayShow opts
+    _ <- case tDir of
+            Nothing  -> exitWithInfo "no path"
+            Just dir -> runLines dir
+
 
     exitWithInfo "Run succesfull"
