@@ -21,9 +21,10 @@ linesMain ::
 linesMain = do
     tDir <- oTargetDirectory <$> view optionsL
 
-    _ <- case tDir of
+    res <- case tDir of
             Nothing  -> exitWithInfo "no path"
             Just dir -> runLines dir
 
+    logDebug $ displayShow res
 
     exitWithInfo "Run succesfull"

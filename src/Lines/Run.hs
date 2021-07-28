@@ -12,8 +12,10 @@ import           Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
 import           Lines.App.Class
 import           Lines.LinesResult
 import           Lines.Options
+import qualified Prelude
 import           RIO.FilePath              (takeExtension, (</>))
-import           RIO.Text                  as T hiding (concat, filter, map)
+import           RIO.List                  (groupBy, sum)
+import qualified RIO.Text                  as T
 
 runLines
     :: ( HasLogFunc env
@@ -25,13 +27,20 @@ runLines
     => FilePath
     -> RIO env LinesResult
 runLines paths = do
-    ps <- findFiles [paths]
+    if null [paths]
+        then pure NoPaths
+        else
+         do
+            ps <- findFiles [paths]
+            let groupedByExtension = groupBy ((==) `on` snd) ps
 
-    ls <- traverse countLinesInFile $ fst <$> ps
+            lns <- (traverse . traverse) countLinesInFile groupedByExtension
 
-    logDebug $ "lengths" <> displayShow ls
+            let totalsByLang = map countLangTotal lns
+                totalLines = sum $ map (sum . map snd) lns
+                result = toLineCountRes totalLines totalsByLang
 
-    pure NoPaths
+            pure $ LineCounts result
 
 findFiles :: HasSystem env => [FilePath] -> RIO env [(FilePath, Text)]
 findFiles = fmap concat . traverse go
@@ -52,9 +61,20 @@ findFiles = fmap concat . traverse go
 countLinesInFile
     :: ( HasSystem env
        )
-    => FilePath -> RIO env Int
-countLinesInFile filename = do
+    => (FilePath, Text) -> RIO env (Text, Int)
+countLinesInFile (filename, extension) = do
     content <- readFile filename
     let nonempty = filter (/=  "") (T.lines content)
         len = Lines.Prelude.length nonempty
-    pure len
+    pure (extension, len)
+
+countLangTotal :: [(Text, Int)] -> (Text, Int)
+countLangTotal xs = (ext, countTotal $ map snd xs)
+    where
+        ext :: Text
+        ext = fst $ Prelude.head xs
+
+        countTotal :: [Int] -> Int
+        countTotal = sum
+
+

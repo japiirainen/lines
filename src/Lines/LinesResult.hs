@@ -10,18 +10,22 @@ import           Data.Bifunctor
 import           Lines.Prelude
 
 newtype TotalCount = TotalCount Int
+    deriving stock Show
 newtype LangCount = LangCount Int
+    deriving stock Show
 
 
 data LinesResult
     = NoPaths
     | LineCounts LineCountRes
+    deriving stock Show
 
 data LineCountRes
     = LineCountRes
     { total             :: TotalCount
     , resultsByLanguage :: [(Language, LangCount)]
     }
+    deriving stock Show
 
 data Language
     = Haskell
