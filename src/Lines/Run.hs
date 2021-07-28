@@ -23,9 +23,8 @@ runLines paths = do
             ps <- allFiles paths
             lns <- traverse countLinesInFile ps
 
-            let groupedByExtension = groupByExtension lns
-
-            let totalsByLang = countLangTotal groupedByExtension
+            let groupedByExtension = groupByExtension $ catMaybes lns
+                totalsByLang = countLangTotal groupedByExtension
                 totalLines = sum $ map snd totalsByLang
                 result = toLineCountRes totalLines totalsByLang
 
@@ -41,12 +40,15 @@ isLockFile = T.isInfixOf ".lock" . T.pack
 countLinesInFile
     :: ( HasSystem env
        )
-    => (FilePath, Text) -> RIO env (Text, Int)
+    => (FilePath, Text) -> RIO env (Maybe (Text, Int))
 countLinesInFile (filename, extension) = do
-    content <- readFile filename
-    let nonempty = filter (/=  "") (T.lines content)
-        len = Lines.Prelude.length nonempty
-    pure (extension, len)
+    if any (extension ==) supportedLanguageExtensions
+        then do
+            content <- readFile filename
+            let nonempty = filter (/=  "") (T.lines content)
+                len = Lines.Prelude.length nonempty
+            pure $ Just (extension, len)
+        else pure Nothing
 
 countLangTotal :: [(Text, [Int])] -> [(Text, Int)]
 countLangTotal = map go

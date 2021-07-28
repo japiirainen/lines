@@ -1,4 +1,4 @@
-module Main where
+module Main (main) where
 
 import           Lines.App
 import           Lines.Main

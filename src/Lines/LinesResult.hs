@@ -4,6 +4,8 @@ module Lines.LinesResult
     , langCountToString
     , totalCountToString
     , renderResultsAsTable
+    , supportedLanguageExtensions
+    , supportedLanguages
     )
     where
 
@@ -53,6 +55,12 @@ data Language
     | Markdown
     | Cabal
     deriving stock (Show, Eq)
+
+supportedLanguages :: [Language]
+supportedLanguages = [Haskell, Purescript, FSharp, Typescript, Javascript, Java, Scala, Ruby, Python, C, CPP, GraphQL, Unknown, TypescriptReact, JavascriptReact, Shell, JSON, YAML, YML, Markdown, Cabal]
+
+supportedLanguageExtensions :: [Text]
+supportedLanguageExtensions = [".hs", ".purs", ".fs", ".ts", ".js", ".java", ".scala", ".rb", ".py", ".c", ".cpp", ".graphql", ".unknown", ".tsx", ".jsx", ".sh", ".json", ".yaml", ".yml", ".md", ".cabal"]
 
 extToLanguage :: Text -> Language
 extToLanguage = \case
