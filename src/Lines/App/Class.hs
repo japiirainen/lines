@@ -18,6 +18,7 @@ class HasSystem env where
     readFile :: FilePath -> RIO env Text
     readFileBS :: FilePath -> RIO env ByteString
     writeFile :: FilePath -> Text -> RIO env ()
+    removeDirectory :: FilePath -> RIO env ()
 
 class HasProcess env where
     callProcess :: String -> [String] -> RIO env ()
@@ -27,6 +28,7 @@ class HasProcess env where
 
 class HasExit env where
     exitSuccess :: RIO env a
+
 
 exitWithInfo :: (HasLogFunc env, HasExit env) => Utf8Builder -> RIO env a
 exitWithInfo msg = do

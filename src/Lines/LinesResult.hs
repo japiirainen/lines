@@ -3,11 +3,14 @@ module Lines.LinesResult
     , toLineCountRes
     , langCountToString
     , totalCountToString
+    , renderResultsAsTable
     )
     where
 
 import           Data.Bifunctor
 import           Lines.Prelude
+import           Lines.Table
+import qualified Prelude
 
 newtype TotalCount = TotalCount Int
     deriving stock Show
@@ -39,23 +42,41 @@ data Language
     | Python
     | C
     | CPP
-    deriving stock Show
+    | GraphQL
+    | Unknown
+    | TypescriptReact
+    | JavascriptReact
+    | Shell
+    | JSON
+    | YAML
+    | YML
+    | Markdown
+    | Cabal
+    deriving stock (Show, Eq)
 
 extToLanguage :: Text -> Language
 extToLanguage = \case
-    ".hs"    -> Haskell
-    ".purs"  -> Purescript
-    ".fs"    -> FSharp
-    ".ts"    -> Typescript
-    ".js"    -> Javascript
-    ".java"  -> Java
-    ".scala" -> Scala
-    ".rb"    -> Ruby
-    ".py"    -> Python
-    ".c"     -> C
-    ".cpp"   -> CPP
-    -- TODO handle this
-    _        -> error "unknown language"
+    ".hs"      -> Haskell
+    ".purs"    -> Purescript
+    ".fs"      -> FSharp
+    ".ts"      -> Typescript
+    ".js"      -> Javascript
+    ".java"    -> Java
+    ".scala"   -> Scala
+    ".rb"      -> Ruby
+    ".py"      -> Python
+    ".c"       -> C
+    ".cpp"     -> CPP
+    ".graphql" -> GraphQL
+    ".tsx"     -> TypescriptReact
+    ".jsx"     -> JavascriptReact
+    ".sh"      -> Shell
+    ".json"    -> JSON
+    ".yaml"    -> YAML
+    ".yml"     -> YML
+    ".md"      -> Markdown
+    ".cabal"   -> Cabal
+    _          -> Unknown
 
 
 totalCountToString :: TotalCount -> String
@@ -74,3 +95,25 @@ toLineCountRes total rs =
         toRes :: [(Text, Int)] -> [(Language, LangCount)]
         toRes = map (bimap extToLanguage LangCount)
 
+
+
+resultToTable :: LineCountRes -> String
+resultToTable res = render $ head : body <> foot
+    where
+        head = map (underline . bold . cell) ["LANGUAGE", "LINES COUNT"]
+        body = map rows $ resultsByLanguage res
+        rows :: (Language, LangCount) -> [Cell]
+        rows (lang, count) =
+            [ blue $ cell $ show lang
+            , green $ cell $ langCountToString count
+            ]
+        foot =
+            [ replicate 2 . cell $ "--------",
+                [ red $ bold . cell $ "TOTAL LINES"
+                , red $ bold . cell $ totalCountToString $ total res
+                ]
+            ]
+
+
+renderResultsAsTable :: LineCountRes -> RIO env ()
+renderResultsAsTable res = liftIO $ Prelude.putStrLn $ "\n" <> resultToTable res

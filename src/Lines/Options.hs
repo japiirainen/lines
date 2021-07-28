@@ -1,6 +1,8 @@
 module Lines.Options
     ( Options(..)
     , HasOptions(..)
+    , DefaultOptions(..)
+    , HasDefaultOptions(..)
     , parseOptions
     ) where
 
@@ -31,8 +33,15 @@ data Options =
             , oLogColor        :: Bool
             } deriving stock (Show)
 
+data DefaultOptions =
+    DefaultOptions { defaultCloneDir :: FilePath
+                   } deriving stock Show
+
 class HasOptions env where
     optionsL :: Lens' env Options
+
+class HasDefaultOptions env where
+    defaultOptionsL :: Lens' env DefaultOptions
 
 parseOptions :: IO Options
 parseOptions = do

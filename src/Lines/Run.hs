@@ -1,62 +1,42 @@
 {-# LANGUAGE BlockArguments #-}
 module Lines.Run
-    ( findFiles
-    , runLines
+    ( runLines
     )
     where
 
 import           Lines.Prelude
 
 import           Conduit
-import           Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
 import           Lines.App.Class
 import           Lines.LinesResult
-import           Lines.Options
 import qualified Prelude
-import           RIO.FilePath              (takeExtension, (</>))
-import           RIO.List                  (groupBy, sum)
-import qualified RIO.Text                  as T
+import           RIO.FilePath      (takeExtension)
+import           RIO.List          (groupBy, sortBy)
+import qualified RIO.Text          as T
 
-runLines
-    :: ( HasLogFunc env
-       , HasOptions env
-       , HasSystem env
-       , HasSystem env
-       , HasProcess env
-       )
-    => FilePath
-    -> RIO env LinesResult
+runLines :: HasSystem env => FilePath -> RIO env LinesResult
 runLines paths = do
     if null [paths]
         then pure NoPaths
         else
          do
-            ps <- findFiles [paths]
-            let groupedByExtension = groupBy ((==) `on` snd) ps
+            ps <- allFiles paths
+            lns <- traverse countLinesInFile ps
 
-            lns <- (traverse . traverse) countLinesInFile groupedByExtension
+            let groupedByExtension = groupByExtension lns
 
-            let totalsByLang = map countLangTotal lns
-                totalLines = sum $ map (sum . map snd) lns
+            let totalsByLang = countLangTotal groupedByExtension
+                totalLines = sum $ map snd totalsByLang
                 result = toLineCountRes totalLines totalsByLang
 
             pure $ LineCounts result
 
-findFiles :: HasSystem env => [FilePath] -> RIO env [(FilePath, Text)]
-findFiles = fmap concat . traverse go
-    where
-        go :: HasSystem env => FilePath -> RIO env [(FilePath, Text)]
-        go parent = do
-            isDirectory <- doesDirectoryExist parent
 
-            if isDirectory
-                then do
-                    files <- listDirectory parent
-                    findFiles $ map (parent </>) files
-                else fmap maybeToList $ runMaybeT $ do
-                    guardM $ lift $ doesFileExist parent
-                    guardM $ lift $ not <$> isFileSymbolicLink parent
-                    pure (parent, T.pack $ takeExtension parent)
+isPathHidden :: FilePath -> Bool
+isPathHidden = T.isInfixOf "/." . T.pack
+
+isLockFile :: FilePath -> Bool
+isLockFile = T.isInfixOf ".lock" . T.pack
 
 countLinesInFile
     :: ( HasSystem env
@@ -68,13 +48,24 @@ countLinesInFile (filename, extension) = do
         len = Lines.Prelude.length nonempty
     pure (extension, len)
 
-countLangTotal :: [(Text, Int)] -> (Text, Int)
-countLangTotal xs = (ext, countTotal $ map snd xs)
+countLangTotal :: [(Text, [Int])] -> [(Text, Int)]
+countLangTotal = map go
     where
-        ext :: Text
-        ext = fst $ Prelude.head xs
-
-        countTotal :: [Int] -> Int
-        countTotal = sum
+        go :: (Text, [Int]) -> (Text, Int)
+        go (ext, xs) = (ext, sum xs)
 
 
+
+allFiles :: FilePath -> RIO env [(FilePath, Text)]
+allFiles path =
+    runConduitRes $
+            sourceDirectoryDeep True path
+            .| filterC (not . isPathHidden)
+            .| filterC (not . isLockFile)
+            .| mapC (\p -> (p, T.pack $ takeExtension p))
+            .| sinkList
+
+
+groupByExtension :: [(Text, Int)] -> [(Text, [Int])]
+groupByExtension = map (\l -> (fst . Prelude.head $ l, map snd l)) . groupBy ((==) `on` fst)
+          . sortBy (comparing fst)

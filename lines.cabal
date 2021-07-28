@@ -25,6 +25,7 @@ library
       Lines.Options
       Lines.Prelude
       Lines.Run
+      Lines.Table
   other-modules:
       Paths_lines
   hs-source-dirs:

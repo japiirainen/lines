@@ -11,7 +11,8 @@ main = do
     hSetBuffering stderr LineBuffering
     options <- parseOptions
 
-    app <- bootstrapApp options
+    let defaultOptions = DefaultOptions { defaultCloneDir = "lines-temp" }
+    app <- bootstrapApp options defaultOptions
 
     runRIO app linesMain
 

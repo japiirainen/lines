@@ -20,6 +20,9 @@ instance HasLogFunc App where
 instance HasOptions App where
     optionsL = lens appOptions $ \x y -> x { appOptions = y }
 
+instance HasDefaultOptions App where
+    defaultOptionsL = lens defaultOptions $ \x y -> x { defaultOptions = y }
+
 instance HasSystem App where
     getCurrentDirectory  = do
         logDebug "getCurrentDirectory"
@@ -57,6 +60,10 @@ instance HasSystem App where
         logDebug $ "writeFile: " <> displayShow path
         appIO SystemError $ writeFileUtf8 path content
 
+    removeDirectory path = do
+        logDebug $ "removeDirectory: " <> displayShow path
+        appIO SystemError $ Directory.removePathForcibly path
+
 instance HasProcess App where
     callProcess cmd args = do
         logDebug $ "call: " <> fromString cmd <> " " <> displayShow args
@@ -85,14 +92,16 @@ appIO :: MonadUnliftIO m => (IOException -> AppError) -> IO a -> m a
 appIO f = mapAppError f . liftIO
 
 data App =  App
-    { appLogFunc :: LogFunc
-    , appOptions :: Options
+    { appLogFunc     :: LogFunc
+    , appOptions     :: Options
+    , defaultOptions :: DefaultOptions
     }
 
-bootstrapApp :: MonadIO m => Options -> m App
-bootstrapApp options = runRIO app $ pure app
+bootstrapApp :: MonadIO m => Options -> DefaultOptions -> m App
+bootstrapApp options defaultOptions = runRIO app $ pure app
     where
         app = App
             { appLogFunc = linesLogFunc options
             , appOptions = options
+            , defaultOptions = defaultOptions
             }
