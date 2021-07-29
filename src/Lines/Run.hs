@@ -11,10 +11,11 @@ import           Lines.App.Class
 import           Lines.LinesResult
 import qualified Prelude
 import           RIO.FilePath      (takeExtension)
+import           RIO.Lens
 import           RIO.List          (groupBy, sortBy)
 import qualified RIO.Text          as T
 
-runLines :: HasSystem env => FilePath -> RIO env LinesResult
+runLines :: (HasSystem env, HasLogFunc env) => FilePath -> RIO env LinesResult
 runLines paths = do
     if null [paths]
         then pure NoPaths
@@ -22,13 +23,9 @@ runLines paths = do
          do
             ps <- allFiles paths
             lns <- traverse countLinesInFile ps
+            let result = getTotals lns
 
-            let groupedByExtension = groupByExtension $ catMaybes lns
-                totalsByLang = countLangTotal groupedByExtension
-                totalLines = sum $ map snd totalsByLang
-                result = toLineCountRes totalLines totalsByLang
-
-            pure $ LineCounts result
+            pure $ LineCounts $ toLineCountRes (fst result) (snd result)
 
 
 isPathHidden :: FilePath -> Bool
@@ -39,16 +36,33 @@ isLockFile = T.isInfixOf ".lock" . T.pack
 
 countLinesInFile
     :: ( HasSystem env
+       , HasLogFunc env
        )
     => (FilePath, Text) -> RIO env (Maybe (Text, Int))
 countLinesInFile (filename, extension) = do
     if any (extension ==) supportedLanguageExtensions
-        then do
+        then go extension
+        else do
+            if isSupportedFile $ T.pack filename
+                then go $ pathSuffix $ T.pack filename
+            else do
+                logError $ "unsupporter file" <> displayShow filename
+                pure Nothing
+    where
+        isSupportedFile :: Text -> Bool
+        isSupportedFile fname = any (True ==) $ map (`T.isSuffixOf` fname) supportedFiles
+        go :: Text -> (HasSystem env) => RIO env (Maybe (Text, Int))
+        go filepath = do
             content <- readFile filename
             let nonempty = filter (/=  "") (T.lines content)
                 len = Lines.Prelude.length nonempty
-            pure $ Just (extension, len)
-        else pure Nothing
+            pure $ Just (filepath, len)
+        pathSuffix :: Text -> Text
+        pathSuffix path = fromMaybe "" (parts path ^? ix (lastItemIndex $ parts path))
+        parts :: Text -> [Text]
+        parts = T.split (== '/')
+        lastItemIndex :: [Text] -> Int
+        lastItemIndex p = length p - 1
 
 countLangTotal :: [(Text, [Int])] -> [(Text, Int)]
 countLangTotal = map go
@@ -71,3 +85,13 @@ allFiles path =
 groupByExtension :: [(Text, Int)] -> [(Text, [Int])]
 groupByExtension = map (\l -> (fst . Prelude.head $ l, map snd l)) . groupBy ((==) `on` fst)
           . sortBy (comparing fst)
+
+getTotals :: [Maybe (Text, Int)] -> (Int, [(Text, Int)])
+getTotals xs = (total, langTotals)
+    where
+        langTotals :: [(Text, Int)]
+        langTotals = countLangTotal grouped
+        grouped :: [(Text, [Int])]
+        grouped = groupByExtension $ catMaybes xs
+        total :: Int
+        total = sum $ map snd langTotals

@@ -9,7 +9,6 @@ import           Lines.LinesResult
 import           Lines.Options
 import           Lines.Prelude
 import           Lines.Run
-import qualified Prelude
 import qualified RIO.Text          as T
 
 

@@ -6,6 +6,7 @@ module Lines.LinesResult
     , renderResultsAsTable
     , supportedLanguageExtensions
     , supportedLanguages
+    , supportedFiles
     )
     where
 
@@ -54,6 +55,8 @@ data Language
     | YML
     | Markdown
     | Cabal
+    | SQL
+    | Dockerfile
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -62,29 +65,35 @@ supportedLanguages = [Haskell, Purescript, FSharp, Typescript, Javascript, Java,
 supportedLanguageExtensions :: [Text]
 supportedLanguageExtensions = [".hs", ".purs", ".fs", ".ts", ".js", ".java", ".scala", ".rb", ".py", ".c", ".cpp", ".graphql", ".unknown", ".tsx", ".jsx", ".sh", ".json", ".yaml", ".yml", ".md", ".cabal"]
 
+supportedFiles :: [Text]
+supportedFiles = ["dockerfile", "Dockerfile"]
+
 extToLanguage :: Text -> Language
 extToLanguage = \case
-    ".hs"      -> Haskell
-    ".purs"    -> Purescript
-    ".fs"      -> FSharp
-    ".ts"      -> Typescript
-    ".js"      -> Javascript
-    ".java"    -> Java
-    ".scala"   -> Scala
-    ".rb"      -> Ruby
-    ".py"      -> Python
-    ".c"       -> C
-    ".cpp"     -> CPP
-    ".graphql" -> GraphQL
-    ".tsx"     -> TypescriptReact
-    ".jsx"     -> JavascriptReact
-    ".sh"      -> Shell
-    ".json"    -> JSON
-    ".yaml"    -> YAML
-    ".yml"     -> YML
-    ".md"      -> Markdown
-    ".cabal"   -> Cabal
-    _          -> Unknown
+    ".hs"        -> Haskell
+    ".purs"      -> Purescript
+    ".fs"        -> FSharp
+    ".ts"        -> Typescript
+    ".js"        -> Javascript
+    ".java"      -> Java
+    ".scala"     -> Scala
+    ".rb"        -> Ruby
+    ".py"        -> Python
+    ".c"         -> C
+    ".cpp"       -> CPP
+    ".graphql"   -> GraphQL
+    ".tsx"       -> TypescriptReact
+    ".jsx"       -> JavascriptReact
+    ".sh"        -> Shell
+    ".json"      -> JSON
+    ".yaml"      -> YAML
+    ".yml"       -> YML
+    ".md"        -> Markdown
+    ".cabal"     -> Cabal
+    ".sql"       -> SQL
+    "dockerfile" -> Dockerfile
+    "Dockerfile" -> Dockerfile
+    _            -> Unknown
 
 
 totalCountToString :: TotalCount -> String
