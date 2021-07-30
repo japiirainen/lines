@@ -33,7 +33,7 @@ data Options =
             , oLogColor        :: Bool
             } deriving stock (Show)
 
-data DefaultOptions =
+newtype DefaultOptions =
     DefaultOptions { defaultCloneDir :: FilePath
                    } deriving stock Show
 
@@ -76,16 +76,16 @@ optionsParser = CLIOptions
                 <>  value AutoColor
                 )
     <*> optional (strOption
-                 (   long "target-directory"
+                 (   long "dir"
                  <>  short 'd'
                  <>  metavar "DIR"
                  <>  help "Target directory on local machine"
                  ))
     <*> optional (strOption
-                 (   long "remote-repository"
+                 (   long "repo"
                  <>  short 'r'
                  <>  metavar "REPO"
-                 <>  help "Github repository URL"
+                 <>  help "Remote repository URL"
                  ))
 
 parseColorOption :: String -> Either String ColorOption

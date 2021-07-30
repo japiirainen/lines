@@ -24,8 +24,9 @@ runLines paths = do
             ps <- allFiles paths
             lns <- traverse countLinesInFile ps
             let result = getTotals lns
+                totalFiles = length ps
 
-            pure $ LineCounts $ toLineCountRes (fst result) (snd result)
+            pure $ LineCounts $ toLineCountRes (fst result) totalFiles (snd result)
 
 
 isPathHidden :: FilePath -> Bool
@@ -46,7 +47,7 @@ countLinesInFile (filename, extension) = do
             if isSupportedFile $ T.pack filename
                 then go $ pathSuffix $ T.pack filename
             else do
-                logError $ "unsupporter file" <> displayShow filename
+                logDebug $ "unsupporter file" <> displayShow filename
                 pure Nothing
     where
         isSupportedFile :: Text -> Bool
@@ -64,11 +65,11 @@ countLinesInFile (filename, extension) = do
         lastItemIndex :: [Text] -> Int
         lastItemIndex p = length p - 1
 
-countLangTotal :: [(Text, [Int])] -> [(Text, Int)]
+countLangTotal :: [(Text, [Int])] -> [(Text, Int, Int)]
 countLangTotal = map go
     where
-        go :: (Text, [Int]) -> (Text, Int)
-        go (ext, xs) = (ext, sum xs)
+        go :: (Text, [Int]) -> (Text, Int, Int)
+        go (ext, xs) = (ext, sum xs, length xs)
 
 
 
@@ -86,12 +87,16 @@ groupByExtension :: [(Text, Int)] -> [(Text, [Int])]
 groupByExtension = map (\l -> (fst . Prelude.head $ l, map snd l)) . groupBy ((==) `on` fst)
           . sortBy (comparing fst)
 
-getTotals :: [Maybe (Text, Int)] -> (Int, [(Text, Int)])
+getTotals :: [Maybe (Text, Int)] -> (Int, [(Text, Int, Int)])
 getTotals xs = (total, langTotals)
     where
-        langTotals :: [(Text, Int)]
+        langTotals :: [(Text, Int, Int)]
         langTotals = countLangTotal grouped
         grouped :: [(Text, [Int])]
         grouped = groupByExtension $ catMaybes xs
         total :: Int
-        total = sum $ map snd langTotals
+        total = sum $ map snd3 langTotals
+
+
+snd3 :: (a, b, c) -> b
+snd3 (_, x, _) = x

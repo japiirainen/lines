@@ -10,16 +10,21 @@ module Lines.LinesResult
     )
     where
 
-import           Data.Bifunctor
 import           Lines.Prelude
 import           Lines.Table
 import qualified Prelude
 
 newtype TotalCount = TotalCount Int
     deriving stock Show
-newtype LangCount = LangCount Int
+
+newtype LangLinesCount = LangLinesCount Int
     deriving stock Show
 
+newtype FilesCount = FilesCount Int
+    deriving stock Show
+
+newtype LangFilesCount = LangFilesCount Int
+    deriving stock Show
 
 data LinesResult
     = NoPaths
@@ -28,8 +33,9 @@ data LinesResult
 
 data LineCountRes
     = LineCountRes
-    { total             :: TotalCount
-    , resultsByLanguage :: [(Language, LangCount)]
+    { totalLines        :: TotalCount
+    , totalFiles        :: FilesCount
+    , resultsByLanguage :: [(Language, LangLinesCount, LangFilesCount)]
     }
     deriving stock Show
 
@@ -165,35 +171,44 @@ extToLanguage = \case
 totalCountToString :: TotalCount -> String
 totalCountToString (TotalCount n) = show n
 
-langCountToString :: LangCount -> String
-langCountToString (LangCount n) = show n
+langCountToString :: LangLinesCount -> String
+langCountToString (LangLinesCount n) = show n
 
-toLineCountRes :: Int -> [(Text, Int)] -> LineCountRes
-toLineCountRes total rs =
+langFilesCountToString :: LangFilesCount -> String
+langFilesCountToString (LangFilesCount n) = show n
+
+filesCountToString :: FilesCount -> String
+filesCountToString (FilesCount n) = show n
+
+toLineCountRes :: Int -> Int -> [(Text, Int, Int)] -> LineCountRes
+toLineCountRes totalLines totalFiles rs =
     LineCountRes
-        { total = TotalCount total
+        { totalLines = TotalCount totalLines
+        , totalFiles = FilesCount totalFiles
         , resultsByLanguage = toRes rs
         }
     where
-        toRes :: [(Text, Int)] -> [(Language, LangCount)]
-        toRes = map (bimap extToLanguage LangCount)
+        toRes :: [(Text, Int, Int)] -> [(Language, LangLinesCount, LangFilesCount)]
+        toRes = map (\(lang, lns, files) -> (extToLanguage lang, LangLinesCount lns, LangFilesCount files))
 
 
 
 resultToTable :: LineCountRes -> String
 resultToTable res = render $ head : body <> foot
     where
-        head = map (underline . bold . cell) ["LANGUAGE", "LINES COUNT"]
+        head = map (underline . bold . cell) ["LANGUAGE", "LINES COUNT", "FILES COUNT"]
         body = map rows $ resultsByLanguage res
-        rows :: (Language, LangCount) -> [Cell]
-        rows (lang, count) =
+        rows :: (Language, LangLinesCount, LangFilesCount) -> [Cell]
+        rows (lang, linesCount, filesCount) =
             [ blue $ cell $ show lang
-            , green $ cell $ langCountToString count
+            , green $ cell $ langCountToString linesCount
+            , magenta $ cell $ langFilesCountToString filesCount
             ]
         foot =
-            [ replicate 2 . cell $ "--------",
-                [ red $ bold . cell $ "TOTAL LINES"
-                , red $ bold . cell $ totalCountToString $ total res
+            [ replicate 3 . cell $ "------------",
+                [ red $ bold . cell $ "TOTALS"
+                , red $ bold . cell $ totalCountToString $ totalLines res
+                , red $ bold . cell $ filesCountToString $ totalFiles res
                 ]
             ]
 
