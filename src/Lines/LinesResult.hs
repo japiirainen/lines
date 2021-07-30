@@ -65,13 +65,69 @@ data Language
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
-supportedLanguages = [Haskell, Purescript, FSharp, Typescript, Javascript, Java, Scala, Ruby, Python, C, CPP, GraphQL, Unknown, TypescriptReact, JavascriptReact, Shell, JSON, YAML, YML, Markdown, Cabal, Txt, Css, HTML, HeaderFile]
+supportedLanguages =
+                    [ Haskell
+                    , Purescript
+                    , FSharp
+                    , Typescript
+                    , Javascript
+                    , Java
+                    , Scala
+                    , Ruby
+                    , Python
+                    , C
+                    , CPP
+                    , GraphQL
+                    , Unknown
+                    , TypescriptReact
+                    , JavascriptReact
+                    , Shell
+                    , JSON
+                    , YAML
+                    , YML
+                    , Markdown
+                    , Cabal
+                    , Txt
+                    , Css
+                    , HTML
+                    , HeaderFile
+                    ]
 
 supportedLanguageExtensions :: [Text]
-supportedLanguageExtensions = [".hs", ".purs", ".fs", ".ts", ".js", ".java", ".scala", ".rb", ".py", ".c", ".cpp", ".graphql", ".unknown", ".tsx", ".jsx", ".sh", ".json", ".yaml", ".yml", ".md", ".cabal", ".txt", ".css", ".html", ".h"]
+supportedLanguageExtensions =
+                             [ ".hs"
+                             , ".purs"
+                             , ".fs"
+                             , ".ts"
+                             , ".js"
+                             , ".java"
+                             , ".scala"
+                             , ".rb"
+                             , ".py"
+                             , ".c"
+                             , ".cpp"
+                             , ".graphql"
+                             , ".unknown"
+                             , ".tsx"
+                             , ".jsx"
+                             , ".sh"
+                             , ".json"
+                             , ".yaml"
+                             , ".yml"
+                             , ".md"
+                             , ".cabal"
+                             , ".txt"
+                             , ".css"
+                             , ".html"
+                             , ".h"
+                             ]
 
 supportedFiles :: [Text]
-supportedFiles = ["dockerfile", "Dockerfile", "LICENSE"]
+supportedFiles =
+                [ "dockerfile"
+                , "Dockerfile"
+                , "LICENSE"
+                ]
 
 extToLanguage :: Text -> Language
 extToLanguage = \case
