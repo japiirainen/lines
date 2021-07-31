@@ -29,9 +29,12 @@ linesMain = do
     res <- case tRepo of
              Nothing -> do
                 case tDir of
-                    Nothing  -> exitWithInfo "no path"
-                    Just dir -> runLines dir
+                    Nothing  -> exitWithInfo "Invalid usage. You must specify either a directory or a repository"
+                    Just dir -> do
+                         logInfo $ "Running on directory => " <> displayShow dir
+                         runLines dir
              Just repo -> do
+                 logInfo $ "Cloning and running => " <> displayShow repo
                  _ <- gitClone (T.unpack repo) defaultDir
                  runLines defaultDir
 
@@ -39,8 +42,11 @@ linesMain = do
 
     defaultExists <-  doesDirectoryExist defaultDir
     if defaultExists
-        then removeDirectory defaultDir
-        else pure ()
+        then do
+             logInfo $ "done... removing temp dir" <> displayShow defaultDir
+             removeDirectory defaultDir
+        else do
+             pure ()
 
 
     logDebug $ displayShow res
@@ -49,4 +55,5 @@ linesMain = do
         NoPaths           -> pure ()
         LineCounts result -> renderResultsAsTable result
 
+    logInfo "done... exiting"
     pure ()
