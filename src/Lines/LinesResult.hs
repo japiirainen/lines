@@ -26,6 +26,9 @@ newtype FilesCount = FilesCount Int
 newtype LangFilesCount = LangFilesCount Int
     deriving stock Show
 
+newtype LanguagesCount = LanguagesCount Int
+    deriving stock Show
+
 data LinesResult
     = NoPaths
     | LineCounts LineCountRes
@@ -35,6 +38,7 @@ data LineCountRes
     = LineCountRes
     { totalLines        :: TotalCount
     , totalFiles        :: FilesCount
+    , totalLanguages    :: LanguagesCount
     , resultsByLanguage :: [(Language, LangLinesCount, LangFilesCount)]
     }
     deriving stock Show
@@ -180,16 +184,22 @@ langFilesCountToString (LangFilesCount n) = show n
 filesCountToString :: FilesCount -> String
 filesCountToString (FilesCount n) = show n
 
+languagesCountToString :: LanguagesCount -> String
+languagesCountToString (LanguagesCount n) = show n
+
 toLineCountRes :: Int -> Int -> [(Text, Int, Int)] -> LineCountRes
 toLineCountRes totalLines totalFiles rs =
     LineCountRes
         { totalLines = TotalCount totalLines
         , totalFiles = FilesCount totalFiles
         , resultsByLanguage = toRes rs
+        , totalLanguages = LanguagesCount languagesCount
         }
     where
         toRes :: [(Text, Int, Int)] -> [(Language, LangLinesCount, LangFilesCount)]
         toRes = map (\(lang, lns, files) -> (extToLanguage lang, LangLinesCount lns, LangFilesCount files))
+        languagesCount :: Int
+        languagesCount = length rs
 
 
 
@@ -206,11 +216,14 @@ resultToTable res = render $ head : body <> foot
             ]
         foot =
             [ replicate 3 . cell $ "------------",
-                [ red $ bold . cell $ "TOTALS"
-                , red $ bold . cell $ totalCountToString $ totalLines res
-                , red $ bold . cell $ filesCountToString $ totalFiles res
+                [ brightMagenta $ bold . cell $ languagesCount
+                , brightGreen $ bold . cell $ linesTotal
+                , brightMagenta $ bold . cell $ filesTotal
                 ]
             ]
+        languagesCount = languagesCountToString $ totalLanguages res
+        linesTotal = totalCountToString $ totalLines res
+        filesTotal = filesCountToString $ totalFiles res
 
 
 renderResultsAsTable :: LineCountRes -> RIO env ()
