@@ -8,6 +8,7 @@ import           Lines.Prelude
 
 import           Conduit
 import           Lines.App.Class
+import           Lines.App.Error
 import           Lines.LinesResult
 import qualified Prelude
 import           RIO.FilePath      (takeExtension)
@@ -52,16 +53,22 @@ countLinesInFile (filename, extension) = do
     where
         isSupportedFile :: Text -> Bool
         isSupportedFile fname = any (True ==) $ map (`T.isSuffixOf` fname) supportedFiles
-        go :: Text -> (HasSystem env) => RIO env (Maybe (Text, Int))
+
+        go :: Text -> (HasSystem env, HasLogFunc env) => RIO env (Maybe (Text, Int))
         go filepath = do
-            content <- readFile filename
+            content <- readFile filename `catchAny` \e -> do
+                logDebug $ "Error reading file" <> displayShow filename <> ": " <> displayShow e
+                pure "Invalid file format."
             let nonempty = filter (/=  "") (T.lines content)
                 len = Lines.Prelude.length nonempty
             pure $ Just (filepath, len)
+
         pathSuffix :: Text -> Text
         pathSuffix path = fromMaybe "" (parts path ^? ix (lastItemIndex $ parts path))
+
         parts :: Text -> [Text]
         parts = T.split (== '/')
+
         lastItemIndex :: [Text] -> Int
         lastItemIndex p = length p - 1
 
@@ -70,7 +77,6 @@ countLangTotal = map go
     where
         go :: (Text, [Int]) -> (Text, Int, Int)
         go (ext, xs) = (ext, sum xs, length xs)
-
 
 
 allFiles :: FilePath -> RIO env [(FilePath, Text)]

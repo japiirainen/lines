@@ -8,6 +8,7 @@ module Lines.App.Class
 
 import           Lines.Prelude
 
+
 class HasSystem env where
     getCurrentDirectory :: RIO env FilePath
     setCurrentDirectory :: FilePath -> RIO env ()
