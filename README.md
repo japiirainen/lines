@@ -1,6 +1,18 @@
 # lines
 
-Blazing fast CLI for counting lines of any local or remote project.
+Blazing fast CLI tool for counting lines of any local or remote project.
+
+## Install
+
+Currently you need the haskell build tool stack installed to get this working.
+
+### Build from sources
+
+```
+git clone https://github.com/japiirainen/lines.git && make install
+```
+
+This will try to build the project and copy the executable to your local path.
 
 ## Usage
 
@@ -19,4 +31,6 @@ lines --repo https://github.com/japiirainen/lines
 - Support is currently very limited. Feel free to open an issue about missing language support.
 
 ## TODO
-- make installable
+- Support more languages.
+- Try to use conduit for all file processing.
+- Need to somehow ignore folders line node_modules.

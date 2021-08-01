@@ -29,7 +29,7 @@ linesMain = do
     res <- case tRepo of
              Nothing -> do
                 case tDir of
-                    Nothing  -> exitWithInfo "Invalid usage. You must specify either a directory or a repository"
+                    Nothing  -> exitWithInfo "Invalid usage. You must specify either a directory or a remote repository"
                     Just dir -> do
                          logInfo $ "Running on directory => " <> displayShow dir
                          runLines dir

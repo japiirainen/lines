@@ -71,7 +71,7 @@ library
     , transformers
   default-language: Haskell2010
 
-executable lines-exe
+executable lines
   main-is: Main.hs
   other-modules:
       Paths_lines
