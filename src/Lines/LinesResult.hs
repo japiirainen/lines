@@ -72,6 +72,7 @@ data Language
     | Css
     | HTML
     | HeaderFile
+    | CSharp
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -101,6 +102,7 @@ supportedLanguages =
                     , Css
                     , HTML
                     , HeaderFile
+                    , CSharp
                     ]
 
 supportedLanguageExtensions :: [Text]
@@ -130,6 +132,7 @@ supportedLanguageExtensions =
                              , ".css"
                              , ".html"
                              , ".h"
+                             , ".cs"
                              ]
 
 supportedFiles :: [Text]
@@ -166,6 +169,7 @@ extToLanguage = \case
     ".css"       -> Css
     ".html"      -> HTML
     ".h"         -> HeaderFile
+    ".cs"        -> CSharp
     "dockerfile" -> Dockerfile
     "Dockerfile" -> Dockerfile
     "LICENSE"    -> LICENSE
