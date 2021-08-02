@@ -24,6 +24,11 @@ lines --dir some/local/dir
 Run on remote git repository
 ```.sh
 lines --repo https://github.com/japiirainen/lines
+
+Ignore some file paths. For example node_modules
+```.sh
+lines --repo https://github.com/japiirainen/lines --ignore node_modules
+```
 ```
 
 ## Supported languages

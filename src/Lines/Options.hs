@@ -9,6 +9,7 @@ module Lines.Options
 import qualified Env
 import           Lines.Prelude
 import           Options.Applicative
+import qualified RIO.Text            as T
 import           System.Console.ANSI (hSupportsANSI)
 
 data ColorOption
@@ -20,6 +21,7 @@ data CLIOptions =
     CLIOptions { coColor           :: ColorOption
                , coTargetDirectory :: Maybe FilePath
                , coRemoteRepo      :: Maybe Text
+               , coIgnoreFolders   :: Maybe Text
                }
 
 newtype EnvOptions =
@@ -31,6 +33,7 @@ data Options =
             , oTargetDirectory :: Maybe FilePath
             , oLogLevel        :: LogLevel
             , oLogColor        :: Bool
+            , oIgnoreFolders   :: [Text]
             } deriving stock (Show)
 
 newtype DefaultOptions =
@@ -55,11 +58,16 @@ parseOptions = do
         NeverColor  -> pure False
         AutoColor   -> and <$> traverse hSupportsANSI [stdout, stderr]
 
+    ignoreFolders <- case coIgnoreFolders of
+        Nothing -> pure []
+        Just t  -> pure $ T.split (== ',') t
+
     pure Options
         { oRemoteRepo = coRemoteRepo
         , oTargetDirectory = coTargetDirectory
         , oLogLevel = eoLogLevel
         , oLogColor = logColor
+        , oIgnoreFolders = ignoreFolders
         }
 
 
@@ -86,6 +94,12 @@ optionsParser = CLIOptions
                  <>  short 'r'
                  <>  metavar "REPO"
                  <>  help "Remote repository URL"
+                 ))
+    <*> optional (strOption
+                 (   long "ignore"
+                 <>  short 'i'
+                 <>  metavar "IGNORE"
+                 <>  help "Ignore folders."
                  ))
 
 parseColorOption :: String -> Either String ColorOption

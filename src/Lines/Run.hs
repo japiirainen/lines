@@ -8,21 +8,23 @@ import           Lines.Prelude
 
 import           Conduit
 import           Lines.App.Class
-import           Lines.App.Error
 import           Lines.LinesResult
+import           Lines.Options
 import qualified Prelude
 import           RIO.FilePath      (takeExtension)
 import           RIO.Lens
 import           RIO.List          (groupBy, sortBy)
 import qualified RIO.Text          as T
 
-runLines :: (HasSystem env, HasLogFunc env) => FilePath -> RIO env LinesResult
+runLines :: (HasSystem env, HasLogFunc env, HasOptions env) => FilePath -> RIO env LinesResult
 runLines paths = do
+    toIgnore <- oIgnoreFolders <$> view optionsL
+
     if null [paths]
         then pure NoPaths
         else
          do
-            ps <- allFiles paths
+            ps <- allFiles toIgnore paths
             lns <- traverse countLinesInFile ps
             let result = getTotals lns
                 totalFiles = length ps
@@ -32,9 +34,6 @@ runLines paths = do
 
 isPathHidden :: FilePath -> Bool
 isPathHidden = T.isInfixOf "/." . T.pack
-
-isLockFile :: FilePath -> Bool
-isLockFile = T.isInfixOf ".lock" . T.pack
 
 countLinesInFile
     :: ( HasSystem env
@@ -79,12 +78,12 @@ countLangTotal = map go
         go (ext, xs) = (ext, sum xs, length xs)
 
 
-allFiles :: FilePath -> RIO env [(FilePath, Text)]
-allFiles path =
+allFiles :: [Text] -> FilePath -> RIO env [(FilePath, Text)]
+allFiles toIgnore path =
     runConduitRes $
             sourceDirectoryDeep True path
             .| filterC (not . isPathHidden)
-            .| filterC (not . isLockFile)
+            .| filterC (not . isFilePathBlackListed toIgnore)
             .| mapC (\p -> (p, T.pack $ takeExtension p))
             .| sinkList
 

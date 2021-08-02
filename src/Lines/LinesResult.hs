@@ -7,12 +7,14 @@ module Lines.LinesResult
     , supportedLanguageExtensions
     , supportedLanguages
     , supportedFiles
+    , isFilePathBlackListed
     )
     where
 
 import           Lines.Prelude
 import           Lines.Table
 import qualified Prelude
+import qualified RIO.Text      as T
 
 newtype TotalCount = TotalCount Int
     deriving stock Show
@@ -175,6 +177,9 @@ extToLanguage = \case
     "LICENSE"    -> LICENSE
     _            -> Unknown
 
+
+isFilePathBlackListed :: [Text] -> FilePath -> Bool
+isFilePathBlackListed toIgnore p = any (True ==) $ map (`T.isInfixOf` T.pack p) toIgnore
 
 totalCountToString :: TotalCount -> String
 totalCountToString (TotalCount n) = show n
