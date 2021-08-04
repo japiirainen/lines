@@ -75,6 +75,9 @@ data Language
     | HTML
     | HeaderFile
     | CSharp
+    | Elm
+    | Clojure
+    | ClojureScript
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -105,6 +108,9 @@ supportedLanguages =
                     , HTML
                     , HeaderFile
                     , CSharp
+                    , Elm
+                    , Clojure
+                    , ClojureScript
                     ]
 
 supportedLanguageExtensions :: [Text]
@@ -135,6 +141,9 @@ supportedLanguageExtensions =
                              , ".html"
                              , ".h"
                              , ".cs"
+                             , ".elm"
+                             , ".clj"
+                             , ".cljs"
                              ]
 
 supportedFiles :: [Text]
@@ -172,6 +181,9 @@ extToLanguage = \case
     ".html"      -> HTML
     ".h"         -> HeaderFile
     ".cs"        -> CSharp
+    ".elm"       -> Elm
+    ".clj"       -> Clojure
+    ".cljs"      -> ClojureScript
     "dockerfile" -> Dockerfile
     "Dockerfile" -> Dockerfile
     "LICENSE"    -> LICENSE
