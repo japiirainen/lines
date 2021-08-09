@@ -80,6 +80,7 @@ data Language
     | ClojureScript
     | Rust
     | Gleam
+    | Erlang
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -115,6 +116,7 @@ supportedLanguages =
                     , ClojureScript
                     , Rust
                     , Gleam
+                    , Erlang
                     ]
 
 supportedLanguageExtensions :: [Text]
@@ -150,6 +152,7 @@ supportedLanguageExtensions =
                              , ".cljs"
                              , ".rs"
                              , ".gleam"
+                             , ".erl"
                              ]
 
 supportedFiles :: [Text]
@@ -192,6 +195,7 @@ extToLanguage = \case
     ".cljs"      -> ClojureScript
     ".rs"        -> Rust
     ".gleam"     -> Gleam
+    ".erl"       -> Erlang
     "dockerfile" -> Dockerfile
     "Dockerfile" -> Dockerfile
     "LICENSE"    -> LICENSE

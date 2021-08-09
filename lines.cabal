@@ -14,7 +14,6 @@ extra-source-files:
 
 library
   exposed-modules:
-      Lib
       Lines.App
       Lines.App.Class
       Lines.App.Error
