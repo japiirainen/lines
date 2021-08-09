@@ -78,6 +78,8 @@ data Language
     | Elm
     | Clojure
     | ClojureScript
+    | Rust
+    | Gleam
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -111,6 +113,8 @@ supportedLanguages =
                     , Elm
                     , Clojure
                     , ClojureScript
+                    , Rust
+                    , Gleam
                     ]
 
 supportedLanguageExtensions :: [Text]
@@ -144,6 +148,8 @@ supportedLanguageExtensions =
                              , ".elm"
                              , ".clj"
                              , ".cljs"
+                             , ".rs"
+                             , ".gleam"
                              ]
 
 supportedFiles :: [Text]
@@ -184,6 +190,8 @@ extToLanguage = \case
     ".elm"       -> Elm
     ".clj"       -> Clojure
     ".cljs"      -> ClojureScript
+    ".rs"        -> Rust
+    ".gleam"     -> Gleam
     "dockerfile" -> Dockerfile
     "Dockerfile" -> Dockerfile
     "LICENSE"    -> LICENSE
