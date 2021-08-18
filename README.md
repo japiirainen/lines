@@ -39,4 +39,3 @@ lines --repo https://github.com/japiirainen/lines --ignore node_modules
 ## TODO
 - Support more languages.
 - Try to use conduit for all file processing.
-- Need to somehow ignore folders line node_modules.
