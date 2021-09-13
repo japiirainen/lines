@@ -35,7 +35,3 @@ lines --repo https://github.com/japiirainen/lines --ignore node_modules
 ## Supported languages
 
 - Support is currently very limited. Feel free to open an issue about missing language support.
-
-## TODO
-- Support more languages.
-- Try to use conduit for all file processing.
