@@ -81,6 +81,7 @@ data Language
     | Rust
     | Gleam
     | Erlang
+    | OCaml
     deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -117,6 +118,7 @@ supportedLanguages =
                     , Rust
                     , Gleam
                     , Erlang
+                    , OCaml
                     ]
 
 supportedLanguageExtensions :: [Text]
@@ -153,6 +155,8 @@ supportedLanguageExtensions =
                              , ".rs"
                              , ".gleam"
                              , ".erl"
+                             , ".ml"
+                             , ".mli"
                              ]
 
 supportedFiles :: [Text]
@@ -196,6 +200,8 @@ extToLanguage = \case
     ".rs"        -> Rust
     ".gleam"     -> Gleam
     ".erl"       -> Erlang
+    ".ml"        -> OCaml
+    ".mli"       -> OCaml
     "dockerfile" -> Dockerfile
     "Dockerfile" -> Dockerfile
     "LICENSE"    -> LICENSE
