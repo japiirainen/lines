@@ -47,7 +47,7 @@ data LineCountRes
 
 data Language
     = Haskell
-    | Purescript
+    | PureScript
     | FSharp
     | Typescript
     | Javascript
@@ -87,7 +87,7 @@ data Language
 supportedLanguages :: [Language]
 supportedLanguages =
                     [ Haskell
-                    , Purescript
+                    , PureScript
                     , FSharp
                     , Typescript
                     , Javascript
@@ -169,7 +169,7 @@ supportedFiles =
 extToLanguage :: Text -> Language
 extToLanguage = \case
     ".hs"        -> Haskell
-    ".purs"      -> Purescript
+    ".purs"      -> PureScript
     ".fs"        -> FSharp
     ".ts"        -> Typescript
     ".js"        -> Javascript
