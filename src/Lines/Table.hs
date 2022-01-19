@@ -1,8 +1,8 @@
 module Lines.Table where
 
-import           Lines.Prelude
-import           Prelude       (maximum)
-import           RIO.List
+import Lines.Prelude
+import RIO.List
+import Prelude (maximum)
 
 type ColSize = Int
 
