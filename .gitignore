@@ -1,3 +1,5 @@
 .stack-work/
 *~
 test-dir
+.clj-kondo
+.lsp

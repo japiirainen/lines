@@ -77,6 +77,7 @@ data Language
   | Elm
   | Clojure
   | ClojureScript
+  | CLJC
   | Rust
   | Gleam
   | Erlang
@@ -116,6 +117,7 @@ supportedLanguages =
     Elm,
     Clojure,
     ClojureScript,
+    CLJC,
     Rust,
     Gleam,
     Erlang,
@@ -155,6 +157,7 @@ supportedLanguageExtensions =
     ".elm",
     ".clj",
     ".cljs",
+    ".cljc",
     ".rs",
     ".gleam",
     ".erl",
@@ -202,6 +205,7 @@ extToLanguage = \case
   ".elm" -> Elm
   ".clj" -> Clojure
   ".cljs" -> ClojureScript
+  ".cljc" -> CLJC
   ".rs" -> Rust
   ".gleam" -> Gleam
   ".erl" -> Erlang
