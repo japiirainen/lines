@@ -84,6 +84,7 @@ data Language
   | OCaml
   | Go
   | Zig
+  | TOML
   deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -123,7 +124,8 @@ supportedLanguages =
     Erlang,
     OCaml,
     Go,
-    Zig
+    Zig,
+    TOML
   ]
 
 supportedLanguageExtensions :: [Text]
@@ -164,7 +166,8 @@ supportedLanguageExtensions =
     ".ml",
     ".mli",
     ".go",
-    ".zig"
+    ".zig",
+    ".toml"
   ]
 
 supportedFiles :: [Text]
@@ -216,6 +219,7 @@ extToLanguage = \case
   "LICENSE" -> LICENSE
   ".go" -> Go
   ".zig" -> Zig
+  ".toml" -> TOML
   _ -> Unknown
 
 isFilePathBlackListed :: [Text] -> FilePath -> Bool
