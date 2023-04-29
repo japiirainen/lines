@@ -85,6 +85,7 @@ data Language
   | Go
   | Zig
   | TOML
+  | CommonLisp
   deriving stock (Show, Eq)
 
 supportedLanguages :: [Language]
@@ -125,7 +126,8 @@ supportedLanguages =
     OCaml,
     Go,
     Zig,
-    TOML
+    TOML,
+    CommonLisp
   ]
 
 supportedLanguageExtensions :: [Text]
@@ -167,7 +169,9 @@ supportedLanguageExtensions =
     ".mli",
     ".go",
     ".zig",
-    ".toml"
+    ".toml",
+    ".lisp",
+    ".cl"
   ]
 
 supportedFiles :: [Text]
@@ -220,6 +224,8 @@ extToLanguage = \case
   ".go" -> Go
   ".zig" -> Zig
   ".toml" -> TOML
+  ".cl" -> CommonLisp
+  ".lisp" -> CommonLisp
   _ -> Unknown
 
 isFilePathBlackListed :: [Text] -> FilePath -> Bool
